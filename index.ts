@@ -29,6 +29,8 @@ var hero = Body.create({
   friction: 0.1,
   inertia: Infinity,
 });
+let pointerDown = false;
+var isTouching = { left: false, right: false, ground: false };
 Body.translate(hero, { x: 280, y: 20 });
 var boxA = Bodies.rectangle(400, 200, 80, 80);
 var ballA = Bodies.circle(380, 100, 40);
@@ -50,6 +52,14 @@ World.add(engine.world, [
 
 Runner.run(engine);
 Render.run(render);
+Events.on(engine, 'beforeUpdate', function (event) {
+  resetTouching();
+});
+const resetTouching = () => {
+  isTouching.left = false;
+  isTouching.right = false;
+  isTouching.ground = false;
+};
 Events.on(render, 'beforeRender', () => {
   Render.lookAt(
     render,
@@ -61,8 +71,42 @@ Events.on(render, 'beforeRender', () => {
     true
   );
 });
-render.canvas.addEventListener('click', () => {
-  console.log('jump');
-  Body.setVelocity(hero, { x: 0, y: -10 });
+render.canvas.addEventListener('mouseup', () => {
+  pointerDown = false;
 });
-console.log(render);
+render.canvas.addEventListener('mousedown', () => {
+  pointerDown = true;
+  /*
+  console.log('jump');
+  if (isTouching.ground) {
+    Body.setVelocity(hero, { x: 0, y: -10 });
+  }
+  */
+});
+Events.on(engine, 'afterUpdate', () => {
+  console.log('j', pointerDown, isTouching.ground);
+  if (pointerDown && isTouching.ground) {
+    Body.setVelocity(hero, { x: 0, y: -10 });
+  }
+});
+Events.on(engine, 'collisionStart', function (event) {
+  var pairs = event.pairs;
+
+  for (var i = 0, j = pairs.length; i != j; ++i) {
+    var pair = pairs[i];
+    if (pair.bodyA === bottom) {
+      isTouching.ground = true;
+    }
+    /*
+      if (pair.bodyA === collider) {
+          pair.bodyB.render.strokeStyle = colorA;
+      } else if (pair.bodyB === collider) {
+          pair.bodyA.render.strokeStyle = colorA;
+      }
+      */
+  }
+});
+
+Events.on(engine, 'collisionEnd', function (event) {
+  var pairs = event.pairs;
+});
