@@ -88,7 +88,8 @@ Events.on(engine, 'afterUpdate', () => {
     Body.setVelocity(hero, { x: 0, y: -10 });
   }
 });
-Events.on(engine, 'collisionStart', function (event) {
+
+const ev = (event) => {
   var pairs = event.pairs;
 
   for (var i = 0, j = pairs.length; i != j; ++i) {
@@ -96,15 +97,10 @@ Events.on(engine, 'collisionStart', function (event) {
     if (pair.bodyA === bottom) {
       isTouching.ground = true;
     }
-    /*
-      if (pair.bodyA === collider) {
-          pair.bodyB.render.strokeStyle = colorA;
-      } else if (pair.bodyB === collider) {
-          pair.bodyA.render.strokeStyle = colorA;
-      }
-      */
   }
-});
+};
+Events.on(engine, 'collisionActive', ev);
+Events.on(engine, 'collisionStart', ev);
 
 Events.on(engine, 'collisionEnd', function (event) {
   var pairs = event.pairs;
