@@ -33,23 +33,34 @@ var hero = Body.create({
 });
 let pointerDown = false;
 var isTouching = { left: false, right: false, ground: false };
-Body.translate(hero, { x: 280, y: 20 });
-var boxA = Bodies.rectangle(400, 200, 80, 80);
-var ballA = Bodies.circle(380, 100, 40);
-var ballB = Bodies.circle(460, 10, 40);
-var ground = Bodies.rectangle(400, 380, 800, 10, { isStatic: true });
-var ground1 = Bodies.rectangle(400, 5, 800, 10, { isStatic: true });
-var ground2 = Bodies.rectangle(605, 200, 10, 400, { isStatic: true });
+Body.translate(hero, { x: 80, y: 20 });
+
+var ground = Bodies.rectangle(4000, 380, 8000, 10, { isStatic: true });
+var ground1 = Bodies.rectangle(4000, 5, 8000, 10, { isStatic: true });
+var ground2 = Bodies.rectangle(8005, 200, 10, 400, { isStatic: true });
 var ground3 = Bodies.rectangle(5, 200, 10, 400, { isStatic: true });
+var slope = Bodies.rectangle(200, 150, 400, 20, { isStatic: true });
+
+var slope1 = Bodies.rectangle(600, 150, 400, 20, {
+  isStatic: true,
+  angle: Math.PI * 0.06,
+});
+var slope2 = Bodies.rectangle(1000, 250, 400, 20, { isStatic: true });
+var slope3 = Bodies.rectangle(1200, 150, 400, 20, {
+  isStatic: true,
+  angle: -Math.PI * 0.06,
+});
+
 World.add(engine.world, [
   hero,
-  boxA,
-  ballA,
-  ballB,
   ground,
   ground1,
   ground2,
   ground3,
+  slope,
+  slope1,
+  slope2,
+  slope3,
 ]);
 
 Runner.run(engine);
@@ -78,17 +89,35 @@ render.canvas.addEventListener('pointerup', () => {
 });
 render.canvas.addEventListener('pointerdown', () => {
   pointerDown = true;
-  /*
-  console.log('jump');
-  if (isTouching.ground) {
-    Body.setVelocity(hero, { x: 0, y: -10 });
-  }
-  */
 });
+let counter = 0;
+Events.on(engine, 'beforeUpdate', () => {});
 Events.on(engine, 'afterUpdate', () => {
   if (pointerDown && isTouching.ground) {
     Body.setVelocity(hero, { x: 0, y: -10 });
   }
+  counter++;
+  if (counter >= 3) {
+    const isOnGround = isTouching.ground;
+    const moveForce = isOnGround ? 0.01 : 0.005;
+    // prevent high speed on down slopes
+    console.log(hero.velocity.x);
+    if (hero.velocity.x < 1) {
+      Body.applyForce(
+        hero,
+        { x: hero.position.x, y: hero.position.y },
+        { x: moveForce, y: 0 }
+      );
+    }
+    counter = 0;
+  }
+  /*
+  Body.applyForce(
+    hero,
+    { x: hero.position.x, y: hero.position.y },
+    { x: moveForce, y: 0 }
+  );
+  */
 });
 
 const ev = (event) => {
