@@ -14,9 +14,9 @@ var render = Render.create({
     width: window.innerWidth,
     height: window.innerHeight,
     wireframes: true,
+    background: 'rgb(255,0,0)',
   },
 });
-let wake = false;
 
 var bottom = Bodies.rectangle(0, 27.5, 30, 5, {
   isSensor: true,
@@ -77,12 +77,6 @@ render.canvas.addEventListener('pointerup', () => {
   pointerDown = false;
 });
 render.canvas.addEventListener('pointerdown', () => {
-  if (!wake) {
-    try {
-      noSleep.enable();
-      wake = true;
-    } catch (e) {}
-  }
   pointerDown = true;
   /*
   console.log('jump');
@@ -113,3 +107,11 @@ Events.on(engine, 'collisionStart', ev);
 Events.on(engine, 'collisionEnd', function (event) {
   var pairs = event.pairs;
 });
+document.addEventListener(
+  'click',
+  function enableNoSleep() {
+    document.removeEventListener('click', enableNoSleep, false);
+    noSleep.enable();
+  },
+  false
+);
