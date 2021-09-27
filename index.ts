@@ -1,11 +1,6 @@
 // Import stylesheets
 import './style.css';
-import * as Matter from 'matter-js';
-
-var Engine = Matter.Engine,
-  Render = Matter.Render,
-  World = Matter.World,
-  Bodies = Matter.Bodies;
+import { Engine, Render, World, Bodies, Events, Runner, Body } from 'matter-js';
 
 var engine = Engine.create();
 
@@ -19,12 +14,55 @@ var render = Render.create({
   },
 });
 
+var colorA = '#f55a3c',
+  colorB = '#f5d259';
+var bottom = Bodies.rectangle(0, 27.5, 30, 5, {
+  isSensor: true,
+});
+var partA = Bodies.rectangle(0, 0, 30, 50, {
+  chamfer: { radius: 5 },
+});
+var hero = Body.create({
+  parts: [partA, bottom],
+  frictionStatic: 0,
+  frictionAir: 0.02,
+  friction: 0.1,
+  inertia: Infinity,
+});
+Body.translate(hero, { x: 280, y: 20 });
 var boxA = Bodies.rectangle(400, 200, 80, 80);
-var ballA = Bodies.circle(380, 100, 40, 10);
-var ballB = Bodies.circle(460, 10, 40, 10);
-var ground = Bodies.rectangle(400, 380, 810, 60, { isStatic: true });
+var ballA = Bodies.circle(380, 100, 40);
+var ballB = Bodies.circle(460, 10, 40);
+var ground = Bodies.rectangle(400, 380, 800, 10, { isStatic: true });
+var ground1 = Bodies.rectangle(400, 5, 800, 10, { isStatic: true });
+var ground2 = Bodies.rectangle(605, 200, 10, 400, { isStatic: true });
+var ground3 = Bodies.rectangle(5, 200, 10, 400, { isStatic: true });
+World.add(engine.world, [
+  hero,
+  boxA,
+  ballA,
+  ballB,
+  ground,
+  ground1,
+  ground2,
+  ground3,
+]);
 
-World.add(engine.world, [boxA, ballA, ballB, ground]);
-
-Engine.run(engine);
+Runner.run(engine);
 Render.run(render);
+Events.on(render, 'beforeRender', () => {
+  Render.lookAt(
+    render,
+    hero,
+    {
+      x: 180,
+      y: 190,
+    },
+    true
+  );
+});
+render.canvas.addEventListener('click', () => {
+  console.log('jump');
+  Body.setVelocity(hero, { x: 0, y: -10 });
+});
+console.log(render);
