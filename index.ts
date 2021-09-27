@@ -84,7 +84,6 @@ render.canvas.addEventListener('mousedown', () => {
   */
 });
 Events.on(engine, 'afterUpdate', () => {
-  console.log('j', pointerDown, isTouching.ground);
   if (pointerDown && isTouching.ground) {
     Body.setVelocity(hero, { x: 0, y: -10 });
   }
