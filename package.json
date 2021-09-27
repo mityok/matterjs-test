@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@types/matter-js": "^0.17.5",
-    "matter-js": "^0.17.1"
+    "matter-js": "^0.17.1",
+    "nosleep.js": "^0.12.0"
   }
 }

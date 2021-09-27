@@ -1,6 +1,9 @@
 // Import stylesheets
 import './style.css';
 import { Engine, Render, World, Bodies, Events, Runner, Body } from 'matter-js';
+import NoSleep from 'nosleep.js';
+
+var noSleep = new NoSleep();
 
 var engine = Engine.create();
 
@@ -13,9 +16,8 @@ var render = Render.create({
     wireframes: true,
   },
 });
+let wake = false;
 
-var colorA = '#f55a3c',
-  colorB = '#f5d259';
 var bottom = Bodies.rectangle(0, 27.5, 30, 5, {
   isSensor: true,
 });
@@ -71,10 +73,16 @@ Events.on(render, 'beforeRender', () => {
     true
   );
 });
-render.canvas.addEventListener('mouseup', () => {
+render.canvas.addEventListener('pointerup', () => {
   pointerDown = false;
 });
-render.canvas.addEventListener('mousedown', () => {
+render.canvas.addEventListener('pointerdown', () => {
+  if (!wake) {
+    try {
+      noSleep.enable();
+      wake = true;
+    } catch (e) {}
+  }
   pointerDown = true;
   /*
   console.log('jump');
