@@ -46,12 +46,16 @@ var slope1 = Bodies.rectangle(600, 150, 400, 20, {
   angle: Math.PI * 0.06,
 });
 var slope2 = Bodies.rectangle(1000, 250, 400, 20, { isStatic: true });
-var slope3 = Bodies.rectangle(1200, 150, 400, 20, {
+var slope3 = Bodies.rectangle(1400, 150, 400, 20, {
   isStatic: true,
   angle: -Math.PI * 0.06,
 });
 
 var star = Bodies.circle(300, 50, 10, {
+  isSensor: true,
+  isStatic: true,
+});
+var spike = Bodies.rectangle(1150, 220, 20, 20, {
   isSensor: true,
   isStatic: true,
 });
@@ -67,6 +71,7 @@ World.add(engine.world, [
   slope2,
   slope3,
   star,
+  spike,
 ]);
 
 Runner.run(engine);
@@ -90,6 +95,9 @@ Events.on(render, 'beforeRender', () => {
     true
   );
 });
+Events.on(render, 'afterRender', () => {
+  render.context.fillText('hell', 20, 20);
+});
 render.canvas.addEventListener('pointerup', () => {
   pointerDown = false;
 });
@@ -97,10 +105,17 @@ render.canvas.addEventListener('pointerdown', () => {
   pointerDown = true;
 });
 let counter = 0;
+let isHit = false;
 Events.on(engine, 'beforeUpdate', () => {});
 Events.on(engine, 'afterUpdate', () => {
   if (pointerDown && isTouching.ground) {
     Body.setVelocity(hero, { x: 0, y: -10 });
+  }
+  if (isHit) {
+    Body.setVelocity(hero, { x: -12, y: -5 });
+
+    isHit = false;
+    return;
   }
   counter++;
   if (counter >= 3) {
@@ -129,6 +144,9 @@ const ev = (event) => {
     if (pair.bodyB === star) {
       World.remove(engine.world, star);
     }
+    if (pair.bodyB === spike) {
+      isHit = true;
+    }
   }
 };
 Events.on(engine, 'collisionActive', ev);
@@ -145,3 +163,4 @@ document.addEventListener(
   },
   false
 );
+console.log(render.context);
