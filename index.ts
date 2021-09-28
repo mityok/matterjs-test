@@ -10,8 +10,8 @@ var engine = Engine.create();
 const canvas = document.createElement('canvas');
 document.body.append(canvas);
 const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.width = window.innerWidth * devicePixelRatio;
+canvas.height = window.innerHeight * devicePixelRatio;
 
 var bottom = Bodies.rectangle(0, 27.5, 30, 5, {
   isSensor: true,
@@ -83,15 +83,21 @@ function tick() {
   ctx.imageSmoothingEnabled = false;
   ctx.lineWidth = 1;
   ctx.strokeStyle = '#ff0';
-  ctx.fillStyle = '#00f';
+  ctx.fillStyle = '#c00';
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.font = '22px Arial';
-  ctx.fillText('hello', 20, 20);
+  ctx.fillText('hello', 20, 30);
   ctx.fillStyle = '#000';
   ctx.save();
-  ctx.setTransform(1.5, 0, 0, 1.5, 0, 0);
-
-  ctx.transform(1, 0, 0, 1, -hero.position.x + 50, -hero.position.y + 80);
+  const scale = 1.5;
+  ctx.setTransform(
+    scale,
+    0,
+    0,
+    scale,
+    scale * (-hero.position.x + 50),
+    scale * (-hero.position.y + 80)
+  );
 
   var bodies = Composite.allBodies(engine.world);
   ctx.beginPath();
