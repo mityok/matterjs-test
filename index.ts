@@ -87,7 +87,7 @@ function tick() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.font = '22px Arial';
   ctx.fillText('hello', 20, 30);
-  ctx.fillStyle = '#000';
+  ctx.fillStyle = 'rgba(0,0,0,0.2)';
   ctx.save();
   const scale = 1.5;
   ctx.setTransform(
@@ -98,10 +98,10 @@ function tick() {
     scale * (-hero.position.x + 50),
     scale * (-hero.position.y + 80)
   );
-
   var bodies = Composite.allBodies(engine.world);
   ctx.beginPath();
   for (var i = 0; i < bodies.length; i += 1) {
+
     var vertices = bodies[i].vertices;
     ctx.moveTo(vertices[0].x, vertices[0].y);
     for (var j = 1; j < vertices.length; j += 1) {
@@ -111,6 +111,8 @@ function tick() {
   }
   ctx.fill();
   ctx.stroke();
+  ctx.drawImage(princess,hero.position.x -16,hero.position.y-30,princess.width*2,princess.height*2)
+
   ctx.restore();
   requestAnimationFrame(tick);
 }
@@ -182,6 +184,25 @@ document.addEventListener(
   },
   false
 );
-
-tick();
+const loadImage = (url: string) =>
+  new Promise((resolve,reject) => {
+    const img = new Image();
+    img.onload = () => {
+      resolve(img);
+    };
+    img.onerror=reject
+    img.src = url;
+  });
+  let princess = null
 console.log(hero);
+const init = async () => {
+  try{
+   princess = await loadImage('https://raw.githubusercontent.com/mityok/matterjs-test/master/assets/princess.png');
+  }catch(e){
+console.log(e)
+  }
+  tick();
+};
+
+
+init();
