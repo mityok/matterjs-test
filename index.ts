@@ -13,7 +13,7 @@ var render = Render.create({
   options: {
     width: window.innerWidth,
     height: window.innerHeight,
-    wireframes: true,
+    wireframes: false,
     background: 'rgb(255,0,0)',
   },
 });
@@ -99,10 +99,9 @@ Events.on(engine, 'afterUpdate', () => {
   counter++;
   if (counter >= 3) {
     const isOnGround = isTouching.ground;
-    const moveForce = isOnGround ? 0.01 : 0.005;
+    const moveForce = isOnGround ? 0.02 : 0.005;
     // prevent high speed on down slopes
-    console.log(hero.velocity.x);
-    if (hero.velocity.x < 1) {
+    if (hero.velocity.x < 3) {
       Body.applyForce(
         hero,
         { x: hero.position.x, y: hero.position.y },
@@ -111,13 +110,6 @@ Events.on(engine, 'afterUpdate', () => {
     }
     counter = 0;
   }
-  /*
-  Body.applyForce(
-    hero,
-    { x: hero.position.x, y: hero.position.y },
-    { x: moveForce, y: 0 }
-  );
-  */
 });
 
 const ev = (event) => {
