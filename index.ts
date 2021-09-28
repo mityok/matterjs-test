@@ -79,13 +79,17 @@ const resetTouching = () => {
 
 function tick() {
   Engine.update(engine, 16);
-  ctx.fillText('hell', 20, 20);
   //
 
   ctx.lineWidth = 1;
   ctx.strokeStyle = '#ff0';
   ctx.fillStyle = '#000';
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillText('hell', 20, 50);
+  ctx.save();
+  ctx.setTransform(1.5, 0, 0, 1.5, 0, 0);
+
+  ctx.transform(1, 0, 0, 1, -hero.position.x + 50, -hero.position.y + 80);
 
   var bodies = Composite.allBodies(engine.world);
   ctx.beginPath();
@@ -99,6 +103,7 @@ function tick() {
   }
   ctx.fill();
   ctx.stroke();
+  ctx.restore();
   requestAnimationFrame(tick);
 }
 
@@ -171,3 +176,4 @@ document.addEventListener(
 );
 
 tick();
+console.log(hero);
