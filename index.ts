@@ -51,6 +51,11 @@ var slope3 = Bodies.rectangle(1200, 150, 400, 20, {
   angle: -Math.PI * 0.06,
 });
 
+var star = Bodies.circle(300, 50, 10, {
+  isSensor: true,
+  isStatic: true,
+});
+
 World.add(engine.world, [
   hero,
   ground,
@@ -61,6 +66,7 @@ World.add(engine.world, [
   slope1,
   slope2,
   slope3,
+  star,
 ]);
 
 Runner.run(engine);
@@ -119,6 +125,9 @@ const ev = (event) => {
     var pair = pairs[i];
     if (pair.bodyA === bottom) {
       isTouching.ground = true;
+    }
+    if (pair.bodyB === star) {
+      World.remove(engine.world, star);
     }
   }
 };
