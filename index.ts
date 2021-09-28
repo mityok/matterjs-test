@@ -80,11 +80,12 @@ const resetTouching = () => {
 function tick() {
   Engine.update(engine, 16);
   //
-
+  ctx.imageSmoothingEnabled = false;
   ctx.lineWidth = 1;
   ctx.strokeStyle = '#ff0';
-  ctx.fillStyle = '#f00';
+  ctx.fillStyle = '#00f';
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.font = '22px Arial';
   ctx.fillText('hello', 20, 20);
   ctx.fillStyle = '#000';
   ctx.save();
