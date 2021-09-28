@@ -1,22 +1,17 @@
 // Import stylesheets
 import './style.css';
-import { Engine, Render, World, Bodies, Events, Runner, Body } from 'matter-js';
+import { Engine, World, Bodies, Events, Body, Composite } from 'matter-js';
 import NoSleep from 'nosleep.js';
 
 var noSleep = new NoSleep();
 
 var engine = Engine.create();
 
-var render = Render.create({
-  element: document.body,
-  engine: engine,
-  options: {
-    width: window.innerWidth,
-    height: window.innerHeight,
-    wireframes: false,
-    background: 'rgb(255,0,0)',
-  },
-});
+const canvas = document.createElement('canvas');
+document.body.append(canvas);
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
 var bottom = Bodies.rectangle(0, 27.5, 30, 5, {
   isSensor: true,
@@ -73,9 +68,6 @@ World.add(engine.world, [
   star,
   spike,
 ]);
-
-Runner.run(engine);
-Render.run(render);
 Events.on(engine, 'beforeUpdate', function (event) {
   resetTouching();
 });
@@ -84,29 +76,43 @@ const resetTouching = () => {
   isTouching.right = false;
   isTouching.ground = false;
 };
-Events.on(render, 'beforeRender', () => {
-  Render.lookAt(
-    render,
-    hero,
-    {
-      x: 180,
-      y: 190,
-    },
-    true
-  );
-});
-Events.on(render, 'afterRender', () => {
-  render.context.fillText('hell', 20, 20);
-});
-render.canvas.addEventListener('pointerup', () => {
+
+function tick() {
+  Engine.update(engine, 16);
+  ctx.fillText('hell', 20, 20);
+  //
+
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = '#ff0';
+  ctx.fillStyle = '#000';
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  var bodies = Composite.allBodies(engine.world);
+  ctx.beginPath();
+  for (var i = 0; i < bodies.length; i += 1) {
+    var vertices = bodies[i].vertices;
+    ctx.moveTo(vertices[0].x, vertices[0].y);
+    for (var j = 1; j < vertices.length; j += 1) {
+      ctx.lineTo(vertices[j].x, vertices[j].y);
+    }
+    ctx.lineTo(vertices[0].x, vertices[0].y);
+  }
+  ctx.fill();
+  ctx.stroke();
+  requestAnimationFrame(tick);
+}
+
+canvas.addEventListener('pointerup', () => {
   pointerDown = false;
 });
-render.canvas.addEventListener('pointerdown', () => {
+canvas.addEventListener('pointerdown', () => {
   pointerDown = true;
 });
 let counter = 0;
 let isHit = false;
+
 Events.on(engine, 'beforeUpdate', () => {});
+
 Events.on(engine, 'afterUpdate', () => {
   if (pointerDown && isTouching.ground) {
     Body.setVelocity(hero, { x: 0, y: -10 });
@@ -163,4 +169,5 @@ document.addEventListener(
   },
   false
 );
-console.log(render.context);
+
+tick();
