@@ -85,7 +85,7 @@ function tick() {
   ctx.strokeStyle = '#ff0';
   ctx.fillStyle = '#000';
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillText('hell', 20, 50);
+  ctx.fillText('hello', 20, 20);
   ctx.save();
   ctx.setTransform(1.5, 0, 0, 1.5, 0, 0);
 
