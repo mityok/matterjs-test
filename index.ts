@@ -1,9 +1,20 @@
 // Import stylesheets
 import './style.css';
-import { Engine, World, Bodies, Events, Body, Composite } from 'matter-js';
+import {
+  Engine,
+  World,
+  Bodies,
+  Events,
+  Body,
+  Composite,
+  Common,
+} from 'matter-js';
 import NoSleep from 'nosleep.js';
 import Hero from './src/units/hero';
 import Level from './src/core/level';
+import decomp from 'poly-decomp';
+window.decomp = decomp;
+Common.setDecomp(decomp);
 
 var noSleep = new NoSleep();
 
@@ -44,7 +55,7 @@ var spike = Bodies.rectangle(1150, 220, 20, 20, {
   isSensor: true,
   isStatic: true,
 });
-
+console.log(ground1, spike);
 World.add(engine.world, [
   hero.body,
   ...level.parts,
@@ -84,15 +95,18 @@ function tick() {
     scale * (-hero.x + 50),
     scale * (-hero.y + 80)
   );
-  var bodies = Composite.allBodies(engine.world);
+  const bodies = Composite.allBodies(engine.world);
   ctx.beginPath();
-  for (var i = 0; i < bodies.length; i += 1) {
+  for (let i = 0; i < bodies.length; i += 1) {
     if (bodies[i] === hero.body) {
       continue;
     }
-    var vertices = bodies[i].vertices;
+    if (bodies[i].parts.length > 1) {
+      for (let k = 0; k < bodies[i].parts.length; k += 1) {}
+    }
+    const vertices = bodies[i].vertices;
     ctx.moveTo(vertices[0].x, vertices[0].y);
-    for (var j = 1; j < vertices.length; j += 1) {
+    for (let j = 1; j < vertices.length; j += 1) {
       ctx.lineTo(vertices[j].x, vertices[j].y);
     }
     ctx.lineTo(vertices[0].x, vertices[0].y);
