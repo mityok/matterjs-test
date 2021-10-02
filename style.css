@@ -23,4 +23,5 @@ svg {
   transform: scale(0.4);
   transform-origin: 0 0;
   opacity: 0.2;
+  pointer-events: none;
 }
