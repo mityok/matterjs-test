@@ -15,3 +15,12 @@ canvas {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
+svg {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  transform: scale(0.4);
+  transform-origin: 0 0;
+  opacity: 0.2;
+}

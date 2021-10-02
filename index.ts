@@ -47,6 +47,7 @@ var spike = Bodies.rectangle(1150, 220, 20, 20, {
 
 World.add(engine.world, [
   hero.body,
+  ...level.parts,
   ground,
   ground1,
   ground2,
@@ -99,7 +100,6 @@ function tick() {
   ctx.fill();
   ctx.stroke();
   hero.draw();
-
   ctx.restore();
   requestAnimationFrame(tick);
 }
