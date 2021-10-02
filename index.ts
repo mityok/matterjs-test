@@ -2,6 +2,8 @@
 import './style.css';
 import { Engine, World, Bodies, Events, Body, Composite } from 'matter-js';
 import NoSleep from 'nosleep.js';
+import Hero from './src/units/hero';
+import Level from './src/core/level';
 
 var noSleep = new NoSleep();
 
@@ -13,22 +15,10 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth * devicePixelRatio;
 canvas.height = window.innerHeight * devicePixelRatio;
 
-var bottom = Bodies.rectangle(0, 27.5, 30, 5, {
-  isSensor: true,
-});
-var partA = Bodies.rectangle(0, 0, 30, 50, {
-  chamfer: { radius: 5 },
-});
-var hero = Body.create({
-  parts: [partA, bottom],
-  frictionStatic: 0,
-  frictionAir: 0.02,
-  friction: 0.1,
-  inertia: Infinity,
-});
+const hero = new Hero(ctx);
+const level = new Level();
+
 let pointerDown = false;
-var isTouching = { left: false, right: false, ground: false };
-Body.translate(hero, { x: 80, y: 20 });
 
 var ground = Bodies.rectangle(4000, 380, 8000, 10, { isStatic: true });
 var ground1 = Bodies.rectangle(4000, 5, 8000, 10, { isStatic: true });
@@ -56,7 +46,7 @@ var spike = Bodies.rectangle(1150, 220, 20, 20, {
 });
 
 World.add(engine.world, [
-  hero,
+  hero.body,
   ground,
   ground1,
   ground2,
@@ -68,14 +58,9 @@ World.add(engine.world, [
   star,
   spike,
 ]);
-Events.on(engine, 'beforeUpdate', function (event) {
-  resetTouching();
+Events.on(engine, 'beforeUpdate', (event) => {
+  hero.beforeUpdate();
 });
-const resetTouching = () => {
-  isTouching.left = false;
-  isTouching.right = false;
-  isTouching.ground = false;
-};
 
 function tick() {
   Engine.update(engine, 16);
@@ -95,13 +80,13 @@ function tick() {
     0,
     0,
     scale,
-    scale * (-hero.position.x + 50),
-    scale * (-hero.position.y + 80)
+    scale * (-hero.x + 50),
+    scale * (-hero.y + 80)
   );
   var bodies = Composite.allBodies(engine.world);
   ctx.beginPath();
   for (var i = 0; i < bodies.length; i += 1) {
-    if (bodies[i] === hero) {
+    if (bodies[i] === hero.body) {
       continue;
     }
     var vertices = bodies[i].vertices;
@@ -113,13 +98,7 @@ function tick() {
   }
   ctx.fill();
   ctx.stroke();
-  ctx.drawImage(
-    princess,
-    hero.position.x - 16,
-    hero.position.y - 34,
-    princess.width * 2,
-    princess.height * 2
-  );
+  hero.draw();
 
   ctx.restore();
   requestAnimationFrame(tick);
@@ -131,55 +110,28 @@ canvas.addEventListener('pointerup', () => {
 canvas.addEventListener('pointerdown', () => {
   pointerDown = true;
 });
-let counter = 0;
-let isHit = false;
-
-Events.on(engine, 'beforeUpdate', () => {});
 
 Events.on(engine, 'afterUpdate', () => {
-  if (pointerDown && isTouching.ground) {
-    Body.setVelocity(hero, { x: 0, y: -10 });
-  }
-  if (isHit) {
-    Body.setVelocity(hero, { x: -12, y: -5 });
-
-    isHit = false;
-    return;
-  }
-  counter++;
-  if (counter >= 3) {
-    const isOnGround = isTouching.ground;
-    const moveForce = isOnGround ? 0.02 : 0.005;
-    // prevent high speed on down slopes
-    if (hero.velocity.x < 3) {
-      Body.applyForce(
-        hero,
-        { x: hero.position.x, y: hero.position.y },
-        { x: moveForce, y: 0 }
-      );
-    }
-    counter = 0;
-  }
+  hero.jump(pointerDown);
+  hero.move();
 });
 
-const ev = (event) => {
+const collisionCheck = (event) => {
   var pairs = event.pairs;
-
   for (var i = 0, j = pairs.length; i != j; ++i) {
     var pair = pairs[i];
-    if (pair.bodyA === bottom) {
-      isTouching.ground = true;
-    }
+    hero.checkCollision(pair.bodyA);
+
     if (pair.bodyB === star) {
       World.remove(engine.world, star);
     }
     if (pair.bodyB === spike) {
-      isHit = true;
+      hero.isHit = true;
     }
   }
 };
-Events.on(engine, 'collisionActive', ev);
-Events.on(engine, 'collisionStart', ev);
+Events.on(engine, 'collisionActive', collisionCheck);
+Events.on(engine, 'collisionStart', collisionCheck);
 
 Events.on(engine, 'collisionEnd', function (event) {
   var pairs = event.pairs;
@@ -192,22 +144,12 @@ document.addEventListener(
   },
   false
 );
-const loadImage = (url: string) =>
-  new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      resolve(img);
-    };
-    img.onerror = reject;
-    img.src = url;
-  });
+
 let princess = null;
 console.log(hero);
 const init = async () => {
   try {
-    princess = await loadImage(
-      'https://raw.githubusercontent.com/mityok/matterjs-test/master/assets/princess.png'
-    );
+    await hero.init();
   } catch (e) {
     console.log(e);
   }
