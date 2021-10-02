@@ -13,7 +13,6 @@ import NoSleep from 'nosleep.js';
 import Hero from './src/units/hero';
 import Level from './src/core/level';
 import decomp from 'poly-decomp';
-window.decomp = decomp;
 Common.setDecomp(decomp);
 
 var noSleep = new NoSleep();
@@ -101,15 +100,16 @@ function tick() {
     if (bodies[i] === hero.body) {
       continue;
     }
-    if (bodies[i].parts.length > 1) {
-      for (let k = 0; k < bodies[i].parts.length; k += 1) {}
+    const partLength = bodies[i].parts.length;
+    const start = partLength == 1 ? 0 : 1;
+    for (let k = start; k < partLength; k += 1) {
+      const vertices = bodies[i].parts[k].vertices;
+      ctx.moveTo(vertices[0].x, vertices[0].y);
+      for (let j = 1; j < vertices.length; j += 1) {
+        ctx.lineTo(vertices[j].x, vertices[j].y);
+      }
+      ctx.lineTo(vertices[0].x, vertices[0].y);
     }
-    const vertices = bodies[i].vertices;
-    ctx.moveTo(vertices[0].x, vertices[0].y);
-    for (let j = 1; j < vertices.length; j += 1) {
-      ctx.lineTo(vertices[j].x, vertices[j].y);
-    }
-    ctx.lineTo(vertices[0].x, vertices[0].y);
   }
   ctx.fill();
   ctx.stroke();

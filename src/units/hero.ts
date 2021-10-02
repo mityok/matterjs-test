@@ -25,7 +25,7 @@ export default class Hero {
       friction: 0.1,
       inertia: Infinity,
     });
-    Body.translate(this.#hero, { x: 80, y: 20 });
+    Body.translate(this.#hero, { x: 20, y: 20 });
   }
   init = async () => {
     this.#princessImage = await loadImage(
