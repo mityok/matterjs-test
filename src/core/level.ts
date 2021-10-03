@@ -14,6 +14,11 @@ export default class Level {
 
     const polys = generatePolygons(this.#svg, this.#maxHeight);
     this.#parts = this.#fillPlatforms(polys);
+    var ground = Bodies.rectangle(4000, 380, 8000, 10, { isStatic: true });
+    var ground1 = Bodies.rectangle(4000, 5, 8000, 10, { isStatic: true });
+    var ground2 = Bodies.rectangle(8005, 200, 10, 400, { isStatic: true });
+    var ground3 = Bodies.rectangle(5, 200, 10, 400, { isStatic: true });
+    this.#parts = [...this.#parts, ground, ground1, ground2, ground3];
   }
   #fillPlatforms(polys: { x: number; y: number }[]) {
     const vertices = Vertices.create(polys, undefined);
@@ -53,7 +58,6 @@ const generatePolygons = (svg: SVGSVGElement, maxHeight: number) => {
     const ex = points[points.length - 1].x;
     if (i) {
       const sameXpos = points[0].x === polygons[polygons.length - 1].x;
-
       if (!sameXpos) {
         points.unshift({ x: sx, y: maxHeight - 5 });
         points.unshift({
@@ -64,7 +68,6 @@ const generatePolygons = (svg: SVGSVGElement, maxHeight: number) => {
     }
     if (i === polys.length - 1) {
       points.push({ x: ex, y: maxHeight });
-
       points.push({ x: polygons[0].x, y: maxHeight });
     }
     polygons = [...polygons, ...points];

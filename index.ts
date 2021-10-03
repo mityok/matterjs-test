@@ -30,10 +30,6 @@ const level = new Level();
 
 let pointerDown = false;
 
-var ground = Bodies.rectangle(4000, 380, 8000, 10, { isStatic: true });
-var ground1 = Bodies.rectangle(4000, 5, 8000, 10, { isStatic: true });
-var ground2 = Bodies.rectangle(8005, 200, 10, 400, { isStatic: true });
-var ground3 = Bodies.rectangle(5, 200, 10, 400, { isStatic: true });
 var slope = Bodies.rectangle(200, 150, 400, 20, { isStatic: true });
 
 var slope1 = Bodies.rectangle(600, 150, 400, 20, {
@@ -54,14 +50,9 @@ var spike = Bodies.rectangle(1150, 220, 20, 20, {
   isSensor: true,
   isStatic: true,
 });
-console.log(ground1, spike);
 World.add(engine.world, [
   hero.body,
   ...level.parts,
-  ground,
-  ground1,
-  ground2,
-  ground3,
   slope,
   slope1,
   slope2,
